@@ -1,6 +1,6 @@
 {
     "id": "jetty9-maven-clickstart",
-    "name": "Jetty 9",
+    "name": "Jetty 9 App",
     "source": "git://github.com/CloudBees-community/jetty9-maven-clickstart.git",
     "description" : "Deploy your Maven web application on Jetty 9",
     "doc-url" : "https://github.com/CloudBees-community/jetty9-maven-clickstart/blob/master/README.md",
@@ -8,7 +8,7 @@
     "icon" : "https://raw.github.com/CloudBees-community/jetty9-maven-clickstart/master/icon.png",
 
     "supported-by" : "cloudbees",
-    "order" : 400,
+    "order" : 3,
 
     "runtime": {
         "type": "jetty9"
