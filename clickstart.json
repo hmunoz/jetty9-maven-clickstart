@@ -8,7 +8,7 @@
     "icon" : "https://raw.github.com/CloudBees-community/jetty9-maven-clickstart/master/icon.png",
 
     "supported-by" : "cloudbees",
-    "order" : 1,
+    "order" : 400,
 
     "runtime": {
         "type": "jetty9"
