@@ -1,0 +1,27 @@
+{
+    "id": "jetty9-maven-clickstart",
+    "name": "Jetty 9",
+    "source": "git://github.com/CloudBees-community/jetty9-maven-clickstart.git",
+    "description" : "Deploy your Maven web application on Jetty 9",
+    "doc-url" : "https://github.com/CloudBees-community/jetty9-maven-clickstart/blob/master/README.md",
+    "app-package": "http://repository-community.forge.cloudbees.com/snapshot/localdomain/localhost/jetty9-maven-clickstart/1.0-SNAPSHOT/jetty9-maven-clickstart-1.0-20130702.140405-14.war",
+    "icon" : "https://raw.github.com/CloudBees-community/jetty9-maven-clickstart/master/icon.png",
+
+    "supported-by" : "cloudbees",
+    "order" : 1,
+
+    "runtime": {
+        "type": "jetty9"
+    },
+    "databases": [
+        {
+            "type": "mysql",
+            "alias": "mydb"
+        }
+    ],
+    "build-with-jenkins": {
+        "template": {
+            "type": "maven"
+        }
+    }
+}
