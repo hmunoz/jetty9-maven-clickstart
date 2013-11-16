@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile" contentType="text/html"
+	renderKitId="PRIMEFACES_MOBILE">
+
+	<pm:page title="Components">
+		<pm:view id="main">
+			<pm:header title="#{messages['provincia.title']}" swatch="b" />
+			<pm:content>
+				<h:panelGrid columns="2" styleClass="ui-responsive">
+					<p:outputPanel style="padding-right: 15px">
+						<h:form>
+							<p:dataList type="inset" styleClass="ui-li-custom"
+								value="#{provinciaBean.provincias}" var="v_prov"
+								paginator="true" rows="5">
+								<f:facet name="header">Provincias</f:facet>
+								<p:column sortBy="descripcion">
+									<p:outputLabel value="#{v_prov.descripcion}"></p:outputLabel>
+								</p:column>
+							</p:dataList>
+						</h:form>
+					</p:outputPanel>
+				</h:panelGrid>
+			</pm:content>
+		</pm:view>
+	</pm:page>
+</f:view>
+

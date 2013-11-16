@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+
+
+	<ui:define name="content">
+		<script type="text/javascript"
+			src="http://maps.google.com/maps/api/js?sensor=false"></script>
+
+		<h2>
+			<h:outputText value="#{messages['sitio.title']}" />
+		</h2>
+
+		<br />
+
+		<h:form id="formLista">
+			<p:dataTable id="lista" value="#{sitioBean.sitios}" var="v_sitio"
+				emptyMessage="No existen provincias" paginator="true"
+				paginatorAlwaysVisible="false" paginatorPosition="top" rows="10">
+				<f:facet name="header">Sitios</f:facet>
+				<p:column headerText="N° de referencia">
+					<p:outputLabel value="#{v_sitio.id}" />
+				</p:column>
+				<p:column headerText="Nombre" sortBy="nombre" filterBy="nombre">
+					<p:outputLabel value="#{v_sitio.nombre}" />
+				</p:column>
+				<p:column headerText="Departamento" sortBy="departamento"
+					filterBy="departamento">
+					<p:outputLabel value="#{v_sitio.departamento.descripcion}" />
+				</p:column>
+
+
+				<p:column>
+					<p:commandButton
+						actionListener="#{sitioBean.eliminar(loginBean.productor,v_sitio)}"
+						onstart="return confirm('#{messages['confirmar.eliminar']}')"
+						value="Eliminar"
+						update=":formLista:lista :alta:nombre :alta:departamento :alta:lat :alta:lng"
+						icon="ui-icon-trash" />
+					<p:commandButton value="Editar" icon="ui-icon-disk"
+						update=":alta:nombre :alta:departamento :alta:lat :alta:lng"
+						action="#{sitioBean.seleccionar(v_sitio)}"
+						oncomplete="handlePoint();">
+					</p:commandButton>
+					<h:inputHidden id="idSitio" value="#{v_sitio.nombre}" />
+					<a
+						href="https://www.google.com/maps/preview#!q=#{v_sitio.coordenada.latitud}+#{v_sitio.coordenada.longitud}"
+						target="_blanck"> <p:commandButton type="button"
+							icon="ui-icon-pin-s" /></a>
+				</p:column>
+
+			</p:dataTable>
+		</h:form>
+		<p:spacer height="30px"></p:spacer>
+		<h:form id="alta">
+			<p:growl id="growl" globalOnly="true" showDetail="true"
+				showSummary="true" />
+			<p:panel header="Crear" id="crearPanel">
+				<p:panelGrid columns="3" style="width:100%;">
+					<p:outputLabel value="Nombre: *" for="nombre" />
+					<p:inputText value="#{sitioBean.sitio.nombre}" id="nombre" />
+					<p:message for="nombre" />
+
+					<h:outputLabel value="Departamento: *" for="departamento" />
+					<p:selectOneMenu id="departamento"
+						converter="#{convertDepartamento}"
+						value="#{sitioBean.sitio.departamento}">
+						<f:selectItem itemLabel="Seleccionar departamento" itemValue="" />
+						<f:selectItems value="#{departamentoBean.departamentos}" var="dep"	itemValue="#{dep}" itemLabel="#{dep.descripcion}" />
+						<!-- <p:ajax event="change" listener="#{sitioBean.cambioDepto()}" update="growl,lng,lat" oncomplete="alert('#{sitioBean.sitio.departamento.descripcion}')"/> -->
+					</p:selectOneMenu>
+					<p:message for="departamento" />
+
+					<p:outputLabel value="Coordenadas: *" for="sitioCoordena" />
+					<p:column id="sitioCoordena">
+
+						<p:panel>
+							<p:gmap widgetVar="map" id="gmap"
+								center="#{sitioBean.sitio.coordenada.latitud},#{sitioBean.sitio.coordenada.longitud}"
+								type="MAP" model="#{sitioBean.draggableModel}"
+								style="width:100%;height:300px"
+								onPointClick="handlePointClick(event);">
+								<p:ajax event="markerDrag" listener="#{sitioBean.onMarkerDrag}"
+									update="growl,lng,lat" />
+							</p:gmap>
+							<f:facet name="footer">
+								<p:outputLabel value="Lat:(*)" for="lat" />
+								<p:inputText id="lat"
+									value="#{sitioBean.sitio.coordenada.latitud}"
+									onkeyup="handlePoint();" />
+
+								<p:outputLabel value="Lng:(*)" for="lng" />
+								<p:inputText id="lng"
+									value="#{sitioBean.sitio.coordenada.longitud}"
+									onkeyup="handlePoint();" />
+							</f:facet>
+						</p:panel>
+					</p:column>
+					<p:column>
+						<p:message for="lat" />
+						<br />
+						<p:message for="lng" />
+					</p:column>
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton action="#{sitioBean.save(loginBean.productor)}"
+						value="Guardar" update=":formLista:lista :alta"
+						oncomplete="cancel();" />
+					<p:commandButton value="Limpiar"
+						update=":alta:nombre :alta:departamento :alta:lat :alta:lng"
+						process="@this" actionListener="#{sitioBean.resetSitio}"
+						immediate="true" onstart="cancel();" />
+				</f:facet>
+			</p:panel>
+		</h:form>
+
+		<script type="text/javascript">  
+		var currentMarker = null;
+		
+		
+		function centerMapa()
+		{
+				PF('map').getMap().setCenter(new google.maps.LatLng($(PrimeFaces.escapeClientId('alta:lat')).val(),$(PrimeFaces.escapeClientId('alta:lng')).val()));			
+		}	
+		
+   		function handlePoint(){   
+    	if (currentMarker == null) {
+    		 currentMarker=new google.maps.Marker({position:new google.maps.LatLng($(PrimeFaces.escapeClientId('alta:lat')).val(),$(PrimeFaces.escapeClientId('alta:lng')).val()),icon : "#{request.contextPath}/resources/img/colmena.png"});  
+    	     PF('map').addOverlay(currentMarker);	
+    	     currentMarker.setDraggable(true);
+
+    	 
+    	     google.maps.event.addListener(currentMarker, "dragend", function() {
+    	         var point = currentMarker.position;    	     	  
+    	         $(PrimeFaces.escapeClientId('alta:lat')).val(point.lat());
+    	         $(PrimeFaces.escapeClientId('alta:lng')).val(point.lng());
+    	     });	
+		} else {
+			currentMarker.setPosition(new google.maps.LatLng($(PrimeFaces.escapeClientId('alta:lat')).val(),$(PrimeFaces.escapeClientId('alta:lng')).val()));
+			
+			}
+    	centerMapa();
+   }  
+   function handlePointClick(event){
+        $(PrimeFaces.escapeClientId('alta:lat')).val(event.latLng.lat());
+        $(PrimeFaces.escapeClientId('alta:lng')).val(event.latLng.lng());
+        handlePoint();
+	}
+    function cancel(){  
+        currentMarker.setMap(null);  
+        currentMarker = null;  
+    }
+</script>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+
+
+		<h2>
+			<h:outputText value="#{messages['productor.title']}" />
+		</h2>
+
+		<br />
+		
+		<h:form id="formLista">
+			<p:dataTable id="lista" value="#{propietarioBean.propietarios}"
+				var="v_prod" emptyMessage="No existen productores" paginator="true" paginatorAlwaysVisible="false"
+				paginatorPosition="top" rows="10">
+				<f:facet name="header">Productores</f:facet>
+				<p:column headerText="Nombre" sortBy="nombre" filterBy="nombre"
+					width="20%">
+					<p:outputLabel value="#{v_prod.nombre}" />
+				</p:column>
+				<p:column headerText="Apellido" sortBy="apellido"
+					filterBy="apellido" width="20%">
+					<p:outputLabel value="#{v_prod.apellido}" />
+				</p:column>
+				
+				<p:column headerText="Telefono" width="20%">
+					<p:outputLabel value="#{v_prod.telefono}" />
+				</p:column>
+				<p:column width="30%">
+					<p:commandButton
+						actionListener="#{propietarioBean.eliminar(v_prod.id)}"
+						value="Eliminar" update=":formLista:lista :alta"
+						icon="ui-icon-trash">
+						<p:confirm header="Confirmation"
+							message="¿Seguro que quiere eliminar este productor?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:commandButton
+						actionListener="#{propietarioBean.seleccionar(v_prod)}"
+						value="Editar" update=":alta:crearPanel" icon="ui-icon-disk" />
+
+					<p:confirmDialog global="true" showEffect="fade"
+						hideEffect="explode">
+						<p:commandButton value="Si" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+					<a	href="mailto:#{v_prod.email}?subject=Consulta"
+						target="_blanck"> <p:commandButton type="button"	icon="ui-icon-mail-closed" value="#{v_prod.email}"/>
+					</a>
+				</p:column>
+			</p:dataTable>
+		</h:form>
+		<p:spacer height="30px"></p:spacer>
+		<h:form id="alta">
+			<p:growl globalOnly="true" showDetail="true" showSummary="true" />
+			<p:panel header="Crear" id="crearPanel">
+				<p:panelGrid columns="3" style="width:100%;">
+					<p:outputLabel value="Nombre(*)" for="provinciaDesc" />
+					<p:inputText value="#{propietarioBean.propietario.nombre}"
+						id="provinciaDesc" />
+					<p:message for="provinciaDesc" />
+
+					<p:outputLabel value="Apellido(*)" for="apellido" />
+					<p:inputText value="#{propietarioBean.propietario.apellido}"
+						id="apellido" />
+					<p:message for="apellido" />
+					
+					<p:outputLabel value="Email(*)" for="email" />
+					<p:inputText value="#{propietarioBean.propietario.email}"
+						id="email" />
+					<p:message for="email" />
+					
+					<p:outputLabel value="Telefono(*)" for="telefono" />
+					<p:inputText value="#{propietarioBean.propietario.telefono}"
+						id="telefono" />
+					<p:message for="telefono" />
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton action="#{propietarioBean.save}" value="Guardar"
+						update=":formLista:lista :alta" />
+					<p:commandButton value="Limpiar" update="alta" process="@this"
+						actionListener="#{propietarioBean.resetProvincia}" />
+				</f:facet>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

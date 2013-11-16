@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+
+
+		<h2>
+			<h:outputText value="#{messages['departamento.title']}" />
+		</h2>
+
+		<br />
+		
+		<h:form id="formLista">
+			<p:growl globalOnly="true" showDetail="true" showSummary="true" />
+			<p:dataTable id="lista" value="#{departamentoBean.departamentos}" var="v_dep" 
+			emptyMessage="No existen departamentos" paginator="true" paginatorAlwaysVisible="false"
+				paginatorPosition="top" rows="10">
+				<f:facet name="header">Departamentos</f:facet>
+				<p:column headerText="Nombre" sortBy="descripcion"
+					filterBy="descripcion" width="30%">
+					<p:outputLabel value="#{v_dep.descripcion}" />
+				</p:column>
+				<p:column headerText="Provincia" sortBy="provincia.descripcion"
+					filterBy="provincia.descripcion" width="30%">
+					<p:outputLabel value="#{v_dep.provincia.descripcion}" />
+				</p:column>
+				<p:column headerText="Codigo Postal" sortBy="cp" filterBy="cp"
+					width="35%">
+					<p:outputLabel value="#{v_dep.cp}" />
+				</p:column>
+				<p:column width="30%">
+					<p:commandButton
+						actionListener="#{departamentoBean.eliminar(v_dep.id)}"
+						value="Eliminar" update=":formLista:lista :alta"
+						icon="ui-icon-trash">
+						<p:confirm header="Confirmation"
+							message="¿Seguro que quiere eliminar el departamento?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:commandButton
+						actionListener="#{departamentoBean.seleccionar(v_dep)}"
+						value="Editar" update=":alta:crearPanel" icon="ui-icon-disk" />
+
+					<p:confirmDialog global="true" showEffect="fade"
+						hideEffect="explode">
+						<p:commandButton value="Si" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:column>
+			</p:dataTable>
+		</h:form>
+		<p:spacer height="30px"></p:spacer>
+		<h:form id="alta">
+			<p:growl globalOnly="true" showDetail="true" showSummary="true" />
+			<p:panel header="Crear" id="crearPanel">
+				<p:panelGrid columns="3" style="width:100%;">
+
+					<p:outputLabel value="Nombre: *" for="departamentoDesc" />
+					<p:inputText value="#{departamentoBean.departamento.descripcion}"
+						id="departamentoDesc" />
+					<p:message for="departamentoDesc" />
+
+					<h:outputLabel for="provincia" value="Provincia: *" />
+					<p:selectOneMenu id="provincia" converter="#{convertProvincia}"
+						value="#{departamentoBean.departamento.provincia}">
+						<f:selectItem itemLabel="Seleccionar Provincia" itemValue="" />
+						<f:selectItems value="#{provinciaBean.provincias}" var="prov"
+							itemValue="#{prov}" itemLabel="#{prov.descripcion}" />
+					</p:selectOneMenu>
+					<p:message for="provincia" />
+					
+					<p:outputLabel value="CP" for="provinciaCP" />
+					<p:inputText value="#{departamentoBean.departamento.cp}" id="provinciaCP" />
+					<p:message for="provinciaCP" />
+
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton action="#{departamentoBean.save}" value="Guardar"
+						update=":formLista:lista :alta" />
+					<p:commandButton value="Limpiar" update="alta" process="@this"
+						actionListener="#{departamentoBean.resetDepartamento}" />
+				</f:facet>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+
+
+		<h2>
+			<h:outputText value="#{messages['registro.title']}" />
+		</h2>
+
+		<br />
+
+		<h:form id="formLista">
+
+			<p:dataTable id="lista" value="#{registroBean.registros}" var="v_reg"
+				emptyMessage="No existen registros" paginator="true"
+				paginatorAlwaysVisible="false" paginatorPosition="top" rows="10">
+				<f:facet name="header">Registros</f:facet>
+				<p:column headerText="Fecha" sortBy="fecha" filterBy="fecha"
+					width="5%">
+					<p:outputLabel value="#{v_reg.fecha}">
+						<f:convertDateTime pattern="dd/MM/yyyy" />
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="Actividad" sortBy="actividad.descripcion"
+					filterBy="actividad.descripcion" width="5%">
+					<p:outputLabel value="#{v_reg.actividad.descripcion}">
+					</p:outputLabel>
+				</p:column>
+
+				<p:column headerText="N° de colmena muerta o descartada" width="35%">
+					<p:outputLabel value="#{v_reg.causaColmenaMuerta.toString()}" />
+					<p:outputLabel
+						value="Causa: #{registroBean.registro.causaColmenaMuerta}" />
+					<p:outputLabel
+						value="Cantidad: #{registroBean.registro.cantColmenaMuerta}" />
+				</p:column>
+
+				<p:column headerText="Alimentación total en apiario" width="60%">
+					<p:outputLabel value="Azúcar: #{registroBean.registro.kgAzucar}Kg" />
+					<p:outputLabel
+						value="Proteico: #{registroBean.registro.kgProteico}Kg" />
+				</p:column>
+
+				<p:column headerText="Traslados y retiros" width="30%">
+					<p:outputLabel value="#{v_reg.causaColmenaMuerta.toString()}" />
+					<p:outputLabel
+						value="N° colmenas: #{registroBean.registro.colmenasTraslado}" />
+					<p:outputLabel
+						value="N° núcleos: #{registroBean.registro.nucleosTraslado}" />
+					<p:outputLabel
+						value="Cant. a Venta: #{registroBean.registro.cantVenta}" />
+					<p:outputLabel
+						value="Cant. a Ampliacion: #{registroBean.registro.cantAmpliacion}" />
+				</p:column>
+
+				<p:column width="30%" exportable="false">
+					<p:commandButton
+						actionListener="#{registroBean.eliminar(v_reg.id)}"
+						value="Eliminar" update=":formLista:lista :alta"
+						icon="ui-icon-trash">
+						<p:confirm header="Confirmation"
+							message="¿Seguro que quiere eliminar esta registro?"
+							icon="ui-icon-alert" />
+					</p:commandButton>
+					<p:commandButton
+						actionListener="#{registroBean.seleccionar(v_reg)}" value="Editar"
+						update=":alta:crearPanel" icon="ui-icon-disk" />
+
+					<p:confirmDialog global="true" showEffect="fade"
+						hideEffect="explode">
+						<p:commandButton value="Si" type="button"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+						<p:commandButton value="No" type="button"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+					</p:confirmDialog>
+				</p:column>
+				<f:facet name="footer">
+					<p:toolbar>
+						<p:toolbarGroup align="left">
+
+							<p:commandButton value="Imprimir" title="Imprimir"	icon="ui-icon-print" ajax="false">
+								<p:dataExporter type="pdf" target="lista" fileName="reporte" />
+							</p:commandButton>
+
+						</p:toolbarGroup>
+					</p:toolbar>
+				</f:facet>
+			</p:dataTable>
+
+		</h:form>
+		<p:spacer height="30px"></p:spacer>
+		<h:form id="alta">
+			<p:growl globalOnly="true" showDetail="true" showSummary="true" />
+			<p:panel header="Crear" id="crearPanel">
+				<p:panelGrid columns="3" style="width:70%;">
+					<p:outputLabel value="Fecha" for="fecha" />
+					<p:calendar value="#{registroBean.registro.fecha}" id="fecha"
+						pattern="dd/MM/yyyy" />
+					<p:message for="fecha" />
+
+					<h:outputLabel for="actividad" value="Actividad: *" />
+					<p:selectOneMenu id="actividad" converter="#{convertActividad}"
+						value="#{registroBean.registro.actividad}">
+						<f:selectItem itemLabel="Seleccionar Actividad..." itemValue="" />
+						<f:selectItems value="#{actividadBean.actividads}" var="act"
+							itemValue="#{act}" itemLabel="#{act.descripcion}" />
+					</p:selectOneMenu>
+					<p:message for="actividad" />
+
+					<h:outputLabel for="colmenaMuerta"
+						value="N° de colmena muerta o descartada" />
+					<p:column>
+						<p:outputLabel value="Causa: *" />
+						<br />
+						<p:selectOneMenu id="colmenaMuerta"
+							value="#{registroBean.registro.causaColmenaMuerta}">
+							<f:selectItem itemLabel="Seleccionar causa..." itemValue="" />
+							<f:selectItems value="#{registroBean.causas}" />
+						</p:selectOneMenu>
+						<br />
+						<p:outputLabel value="Cantidad: *" />
+						<p:spinner id="cantidad"
+							value="#{registroBean.registro.cantColmenaMuerta}" min="0"
+							max="100" />
+					</p:column>
+					<p:message for="colmenaMuerta" />
+
+					<h:outputLabel value="Alimentación total en apiario" />
+					<p:column>
+						<p:outputLabel value="Azúcar: *" />
+						<p:spinner id="azucar" value="#{registroBean.registro.kgAzucar}"
+							suffix=" Kg" min="0.0" max="100" stepFactor="0.1" />
+						<br />
+						<p:outputLabel value="Proteico: *" />
+						<p:spinner id="proteico"
+							value="#{registroBean.registro.kgProteico}" suffix=" Kg"
+							min="0.0" max="100" stepFactor="0.1" />
+					</p:column>
+					<p:column>
+						<p:message for="azucar" />
+						<br />
+						<p:message for="proteico" />
+					</p:column>
+
+					<h:outputLabel value="Traslados y retiros" />
+					<p:column>
+						<p:row>
+							<p:outputLabel value="N° colmenas:" />
+							<p:spinner id="cantColmenas"
+								value="#{registroBean.registro.colmenasTraslado}" min="0"
+								max="100" />
+						</p:row>
+						<br />
+						<p:outputLabel value="N° núcleos:" />
+						<p:spinner id="cantNucleos"
+							value="#{registroBean.registro.nucleosTraslado}" min="0"
+							max="100" />
+						<br />
+						<p:outputLabel value="Cant. a Venta:" />
+						<p:spinner id="cantVentas"
+							value="#{registroBean.registro.cantVenta}" min="0" max="100" />
+						<br />
+						<p:outputLabel value="Cant. a Ampliacion:" />
+						<p:spinner id="cantAmpliacion"
+							value="#{registroBean.registro.cantAmpliacion}" min="0" max="100" />
+					</p:column>
+					<p:message for="colmenaMuerta" />
+
+				</p:panelGrid>
+				<f:facet name="footer">
+					<p:commandButton action="#{registroBean.save(loginBean.productor)}"
+						value="Guardar" update=":formLista:lista :alta" />
+					<p:commandButton value="Limpiar" update="alta" process="@this"
+						actionListener="#{registroBean.resetRegistro}" />
+				</f:facet>
+			</p:panel>
+		</h:form>
+	</ui:define>
+</ui:composition>

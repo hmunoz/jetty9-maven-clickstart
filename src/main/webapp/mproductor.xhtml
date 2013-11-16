@@ -1,0 +1,50 @@
+<f:view xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pm="http://primefaces.org/mobile" contentType="text/html"
+	renderKitId="PRIMEFACES_MOBILE">
+	<pm:page title="Cuenta">
+
+		<!-- Main View -->
+		<pm:view id="main" swatch="e">
+			<pm:header title="Productores" swatch="b">
+				<f:facet name="right">
+					<p:commandButton value="Volver" onclick="PrimeFaces.back()"
+						disabled="true" />
+				</f:facet>
+			</pm:header>
+
+			<pm:content>
+				<h:form id="listNotesForm">
+
+					<p:dataList paginator="true" rows="5"
+						value="#{propietarioBean.propietarios}" var="d">
+						<f:attribute name="paginatorText" value="Mas Productores..." />
+						<h:outputLink value="#lists"
+							onclick="location.href='mailto: #{d.email}?subject=Consulta'">
+							<f:attribute name="icon" value="grid" />
+							<h2>#{d.nombre}, #{d.apellido}</h2>
+							<p>#{d.email}</p>
+							<p>#{d.telefono}</p>
+							<h:outputText styleClass="ui-li-count" value="#{d.sitios.size()}">
+							</h:outputText>
+						</h:outputLink>
+
+						<h:outputLink value="#lists"
+							onclick="location.href='tel: #{d.telefono}'">
+							<f:attribute name="icon" value="grid" />
+							<h2>#{d.nombre}, #{d.apellido}</h2>
+							<p>#{d.email}</p>
+							<p>#{d.telefono}</p>
+							<h:outputText styleClass="ui-li-count" value="#{d.sitios.size()}">
+
+							</h:outputText>
+						</h:outputLink>
+					</p:dataList>
+				</h:form>
+			</pm:content>
+		</pm:view>
+	</pm:page>
+</f:view>
